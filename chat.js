@@ -1,95 +1,211 @@
 // --- Replace these values ---
 const SUPABASE_URL = 'https://opfsnfqakcyaubxfemhp.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_nL82jlMzjLIZb11001HFtQ_VMr9KV3d';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wZnNuZnFha2N5YXVieGZlbWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzA1NjcsImV4cCI6MjA1MDU0NjU2N30.VMr9KV3dI4A8_fKkOdLkMJJHCCjgZTlnZIv6lhIHcCk';
 const N8N_CHAT_WEBHOOK = 'https://hogueinstitute.app.n8n.cloud/webhook/c361deb0-4745-4ac0-8542-afdcbeb75799/chat'; // From Chat Trigger panel
+const LOGIN_PAGE = 'index.html';
 // --------------------------------
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js';
-
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 
 let createChat;
-try {
-({ createChat } = await import('https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js'));
-} catch (e) {
-console.error('Failed to load @n8n/chat ESM bundle:', e);
-showStatus('Chat UI failed to load. Check your network and try again.');
-throw e;
-}
 
-
+// Initialize Supabase client
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-auth: { persistSession: true, storage: localStorage },
+    auth: { 
+        persistSession: true, 
+        storage: localStorage,
+        autoRefreshToken: true 
+    },
 });
-
 
 const container = document.getElementById('chat-container');
+const userEmailEl = document.getElementById('user-email');
+const logoutButton = document.getElementById('logout');
 
-
+// Function to show status messages
 function showStatus(msg, action) {
-const box = document.createElement('div');
-box.style.padding = '1rem';
-box.style.border = '1px solid rgba(255,255,255,.2)';
-box.style.borderRadius = '12px';
-box.style.margin = '1rem 0';
-box.style.background = 'rgba(0,0,0,.2)';
-box.innerHTML = `<p>${msg}</p>`;
-if (action) box.appendChild(action);
-container.replaceChildren(box);
+    const box = document.createElement('div');
+    box.className = 'chat-container';
+    box.innerHTML = `
+        <div class="loader-container">
+            <div class="loader"></div>
+            <p>${msg}</p>
+        </div>
+    `;
+    if (action) {
+        const actionContainer = box.querySelector('.loader-container');
+        actionContainer.appendChild(action);
+    }
+    container.replaceChildren(box);
 }
 
+// Function to redirect to login
+function redirectToLogin() {
+    console.log('Redirecting to login page...');
+    window.location.href = LOGIN_PAGE;
+}
 
+// Setup logout functionality
+if (logoutButton) {
+    logoutButton.addEventListener('click', async () => {
+        try {
+            console.log('Logging out...');
+            await supabase.auth.signOut();
+            localStorage.removeItem('sb_compact');
+            redirectToLogin();
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Force redirect even if logout fails
+            localStorage.clear();
+            redirectToLogin();
+        }
+    });
+}
+
+// Function to get current session with multiple fallback methods
 async function bootstrapSession() {
-// 1) Try current session
-let { data: { session } } = await supabase.auth.getSession();
-if (session?.access_token) return session;
+    console.log('Bootstrapping session...');
+    
+    try {
+        // 1) Try current session first
+        console.log('Checking current session...');
+        let { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+            console.warn('Error getting current session:', error);
+        }
+        if (session?.access_token) {
+            console.log('Found current session');
+            return session;
+        }
 
+        // 2) Try to restore from compact cache (written by auth.js)
+        console.log('Checking compact cache...');
+        const cachedRaw = localStorage.getItem('sb_compact');
+        if (cachedRaw) {
+            try {
+                const cached = JSON.parse(cachedRaw);
+                if (cached?.access_token && cached?.refresh_token) {
+                    console.log('Found cached session, attempting to restore...');
+                    const { data, error } = await supabase.auth.setSession({
+                        access_token: cached.access_token,
+                        refresh_token: cached.refresh_token,
+                    });
+                    if (!error && data?.session?.access_token) {
+                        console.log('Successfully restored session from cache');
+                        return data.session;
+                    }
+                    console.warn('setSession failed:', error);
+                }
+            } catch (e) { 
+                console.warn('Failed to parse sb_compact:', e);
+                localStorage.removeItem('sb_compact'); // Clean up invalid cache
+            }
+        }
 
-// 2) Try to seed from our compact cache (written by auth.js)
-const cachedRaw = localStorage.getItem('sb_compact');
-if (cachedRaw) {
-try {
-const cached = JSON.parse(cachedRaw);
-if (cached?.access_token && cached?.refresh_token) {
-const { data, error } = await supabase.auth.setSession({
-access_token: cached.access_token,
-refresh_token: cached.refresh_token,
-});
-if (!error && data?.session?.access_token) return data.session;
-console.warn('setSession failed:', error);
+        // 3) Try to refresh silently (in case only a refresh_token exists internally)
+        console.log('Attempting to refresh session...');
+        try {
+            const { data, error } = await supabase.auth.refreshSession();
+            if (!error && data?.session?.access_token) {
+                console.log('Successfully refreshed session');
+                return data.session;
+            }
+        } catch (e) { 
+            console.warn('Failed to refresh session:', e);
+        }
+
+        console.log('No valid session found');
+        return null;
+    } catch (error) {
+        console.error('Error in bootstrapSession:', error);
+        return null;
+    }
 }
-} catch (e) { console.warn('Failed to parse sb_compact:', e); }
+
+// Function to load the n8n chat widget
+async function loadChatWidget() {
+    try {
+        console.log('Loading n8n chat widget...');
+        const { createChat } = await import('https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/chat.bundle.es.js');
+        return createChat;
+    } catch (e) {
+        console.error('Failed to load @n8n/chat ESM bundle:', e);
+        throw new Error('Chat UI failed to load. Please check your network connection and try again.');
+    }
 }
 
+// Function to mount the chat interface
+function mountChat(session, createChatFn) {
+    console.log('Mounting chat for user:', session.user?.email);
+    
+    // Update user email in header
+    if (userEmailEl) {
+        userEmailEl.textContent = session.user?.email || 'Unknown user';
+    }
+    
+    const metadata = {
+        supabaseAccessToken: session.access_token,
+        supabaseRefreshToken: session.refresh_token,
+        supabaseUserId: session.user?.id,
+        email: session.user?.email,
+    };
 
-// 3) Try to refresh silently (in case only a refresh_token exists internally)
-try {
-const { data, error } = await supabase.auth.refreshSession();
-if (!error && data?.session?.access_token) return data.session;
-} catch (e) { /* ignore */ }
-
-
-return null;
+    try {
+        createChatFn({
+            webhookUrl: N8N_CHAT_WEBHOOK,
+            metadata,
+            target: '#chat-container',
+            showWelcomeScreen: true,
+            defaultLanguage: 'en',
+        });
+        console.log('Chat widget mounted successfully');
+    } catch (error) {
+        console.error('Error mounting chat widget:', error);
+        showStatus('Failed to initialize chat. Please refresh the page and try again.');
+    }
 }
 
-
-function mountChat(session) {
-const metadata = {
-supabaseAccessToken: session.access_token,
-supabaseRefreshToken: session.refresh_token,
-supabaseUserId: session.user?.id,
-email: session.user?.email,
-};
-
-
-createChat({
-webhookUrl: N8N_CHAT_WEBHOOK,
-metadata,
-target: '#chat-container',
-showWelcomeScreen: true,
-defaultLanguage: 'en',
-});
-}
-
-
+// Main initialization function
 (async () => {
+    try {
+        // Show loading state
+        showStatus('Loading chat interface...');
+        
+        // Check authentication first
+        const session = await bootstrapSession();
+        if (!session) {
+            console.log('No valid session, redirecting to login');
+            redirectToLogin();
+            return;
+        }
+        
+        // Load chat widget
+        showStatus('Initializing chat...');
+        const createChatFn = await loadChatWidget();
+        
+        // Mount chat interface
+        mountChat(session, createChatFn);
+        
+    } catch (error) {
+        console.error('Initialization error:', error);
+        
+        const retryButton = document.createElement('button');
+        retryButton.textContent = 'Retry';
+        retryButton.className = 'auth-button';
+        retryButton.style.marginTop = '1rem';
+        retryButton.onclick = () => window.location.reload();
+        
+        showStatus(error.message || 'Failed to initialize. Please try again.', retryButton);
+    }
+})();
+
+// Listen for auth state changes
+supabase.auth.onAuthStateChange((event, session) => {
+    console.log('Auth state change in chat:', event, session?.user?.email);
+    
+    if (event === 'SIGNED_OUT' || !session) {
+        console.log('User signed out, redirecting to login');
+        localStorage.removeItem('sb_compact');
+        redirectToLogin();
+    }
 });
