@@ -1,96 +1,79 @@
-// chat.js — mounts n8n chat with Supabase credentials carried via `metadata`
-const SUPABASE_URL   = 'https://opfsnfqakcyaubxfemhp.supabase.co';
-const SUPABASE_ANON  = 'sb_publishable_nL82jlMzjLIZb11001HFtQ_VMr9KV3d';
+// --- Replace these values ---
+const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_PUBLIC_KEY';
+const N8N_CHAT_WEBHOOK = 'https://YOUR_N8N_HOST/chat/YOUR_CHAT_TRIGGER_ID'; // From Chat Trigger panel
+// --------------------------------
 
-// Your n8n Chat Trigger webhook URL *ending with /chat*
-const N8N_CHAT_URL   = 'https://hogueinstitute.app.n8n.cloud/webhook/c361deb0-4745-4ac0-8542-afdcbeb75799/chat';
 
-// Optional: restrict allowed origins if you later move off GitHub Pages
-const ALLOWED_ORIGINS = ['github.io'];
+import { createClient } from 'https://esm.sh/@supabase/supabase-js';
 
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-async function mountN8nChat({ jwt, email, userId }) {
-  const container = document.getElementById('chat-container');
-  if (!container) throw new Error('#chat-container not found');
-  container.innerHTML = '<div class="loader" aria-label="Loading"></div>';
-
-  let createChat = null;
-  try {
-    ({ createChat } = await import('https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/index.min.js'));
-  } catch (e) {
-    console.warn('Could not load @n8n/chat embed; falling back to iframe.', e);
-  }
-
-  if (createChat) {
-    container.innerHTML = '';
-    createChat({
-      webhookUrl: N8N_CHAT_URL,
-      metadata: { jwt, email, userId },
-      target: '#chat-container',
-      mode: 'fullscreen', // or 'embedded' depending on n8n version
-      theme: { dark: false },
-    });
-    return;
-  }
-
-  // Fallback: iframe with query params for debugging only
-  const url = new URL(N8N_CHAT_URL);
-  url.searchParams.set('embed', '1');
-  if (email)  url.searchParams.set('email', email);
-  if (userId) url.searchParams.set('userId', userId);
-  if (jwt)    url.searchParams.set('jwt', jwt);
-
-  const iframe = document.createElement('iframe');
-  iframe.src = url.toString();
-  iframe.style.width = '100%';
-  iframe.style.height = '100%';
-  iframe.style.border = '0';
-  container.innerHTML = '';
-  container.appendChild(iframe);
+let createChat;
+try {
+// Load the ESM bundle that exports createChat
+({ createChat } = await import('https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js'));
+} catch (e) {
+console.error('Failed to load @n8n/chat ESM bundle:', e);
+alert('Chat UI failed to load. Check your network and try again.');
+throw e;
 }
 
-async function setupChatPage() {
-  if (!ALLOWED_ORIGINS.some((d) => location.hostname.endsWith(d))) {
-    console.info('Origin:', location.hostname, '(origin hint only)');
-  }
 
-  const userEmailEl = document.getElementById('user-email');
-  const logoutBtn   = document.getElementById('logout-button');
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+auth: { persistSession: true, storage: localStorage },
+});
 
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) {
-    window.location.href = 'index.html';
-    return;
-  }
 
-  const email  = session.user?.email || '';
-  const userId = session.user?.id || '';
-  let jwt      = session.access_token || '';
+async function getActiveSession() {
+const { data: { session } } = await supabase.auth.getSession();
+if (session) return session;
 
-  if (userEmailEl) userEmailEl.textContent = email || '(no email)';
-  await mountN8nChat({ jwt, email, userId });
 
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      const { error } = await sb.auth.signOut();
-      if (error) console.error('Sign out error:', error);
-      window.location.href = 'index.html';
-    });
-  }
-
-  sb.auth.onAuthStateChange(async (event, newSession) => {
-    if (!newSession) return;
-    if (newSession?.access_token && newSession.access_token !== jwt) {
-      jwt = newSession.access_token;
-      await mountN8nChat({
-        jwt,
-        email: newSession.user?.email || email,
-        userId: newSession.user?.id || userId,
-      });
-    }
-  });
+const cached = localStorage.getItem('sb_compact');
+if (cached) {
+try { return JSON.parse(cached); } catch {}
+}
+return null;
 }
 
-document.addEventListener('DOMContentLoaded', setupChatPage);
+
+function ensureSignedIn(session) {
+if (!session?.access_token) {
+window.location.href = 'index.html';
+throw new Error('Not signed in');
+}
+}
+
+
+function startN8nChat(session) {
+const metadata = {
+supabaseAccessToken: session.access_token,
+supabaseRefreshToken: session.refresh_token,
+supabaseUserId: session.user?.id,
+email: session.user?.email,
+};
+
+
+createChat({
+webhookUrl: N8N_CHAT_WEBHOOK,
+metadata,
+target: '#chat-container',
+showWelcomeScreen: true,
+defaultLanguage: 'en',
+// mode: 'fullscreen', // optional
+});
+}
+
+
+getActiveSession().then((session) => {
+ensureSignedIn(session);
+startN8nChat(session);
+});
+
+
+// Log out handler
+document.getElementById('logout')?.addEventListener('click', async () => {
+await supabase.auth.signOut();
+localStorage.removeItem('sb_compact');
+window.location.href = 'index.html';
+});
