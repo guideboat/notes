@@ -165,7 +165,7 @@ function mountChat(session, createChatFn) {
 			    subtitle: "Freeform notes you control",
 			    footer: '',
 			    getStarted: 'New Conversation',
-			    inputPlaceholder: 'Type your question..',
+			    inputPlaceholder: 'Memory, task, or question..',
 	    	},
 	},
         });
