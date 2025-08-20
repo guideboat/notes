@@ -152,11 +152,27 @@ body {
     border-color: #a1a1aa;
 }
 
+/* Updated chat container to reduce whitespace */
 .chat-container {
     flex-grow: 1;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Changed from center to flex-start */
+    padding-top: 2rem; /* Add minimal top padding */
+    width: 100%;
+}
+
+/* New styles to make the chat widget wider */
+#chat-container {
+    width: 90%; /* Make it 90% of available width */
+    max-width: 1200px; /* Set a reasonable maximum width */
+    height: calc(100vh - 120px); /* Take up most of the remaining height */
+}
+
+/* Style the n8n chat widget to be wider */
+#chat-container > div {
+    width: 100% !important;
+    max-width: none !important;
 }
 
 .loader {
