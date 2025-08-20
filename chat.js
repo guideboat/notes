@@ -2,8 +2,8 @@
 // 1. CONFIGURATION
 // ============================================================================
 // Replace these with your actual Supabase project URL and public anon key.
-const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // e.g., 'https://xyz.supabase.co'
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://opfsnfqakcyaubxfemhp.supabase.co'; // e.g., 'https://xyz.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_nL82jlMzjLIZb11001HFtQ_VMr9KV3d';
 
 // Replace this with your actual n8n Chat Webhook URL.
 const N8N_CHAT_URL = 'YOUR_N8N_CHAT_WEBHOOK_URL';
