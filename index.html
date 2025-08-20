@@ -3,20 +3,34 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Notes – Sign in</title>
+<title>Notes — Sign in</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<main class="card">
-<h1>Sign in to Notes</h1>
-<form id="login-form">
-<label>Email <input id="email" type="email" required placeholder="you@example.com" /></label>
-<label>Password <input id="password" type="password" required /></label>
-<button type="submit">Sign in</button>
-</form>
-<p id="error" class="error" hidden></p>
-</main>
-
+<div class="auth-container">
+    <div class="auth-card">
+        <h1 class="card-title">Sign in to Notes</h1>
+        <p class="card-subtitle">Access your secure chat interface</p>
+        
+        <form id="login-form">
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input id="email" type="email" required placeholder="you@example.com" />
+            </div>
+            
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" required />
+            </div>
+            
+            <button type="submit" class="auth-button">Sign in</button>
+        </form>
+        
+        <div id="error" class="error-message"></div>
+        
+        <p class="footer-text">Secure authentication powered by Supabase</p>
+    </div>
+</div>
 
 <script type="module" src="auth.js"></script>
 </body>
