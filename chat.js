@@ -155,9 +155,19 @@ function mountChat(session, createChatFn) {
             webhookUrl: N8N_CHAT_WEBHOOK,
             metadata,
             target: '#chat-container',
-            showWelcomeScreen: true,
+            mode: 'fullscreen',
+            showWelcomeScreen: false,
             defaultLanguage: 'en',
             initialMessages: ['Hello'],
+            i18n: {
+		    en: {
+			    title: 'Memory Tool',
+			    subtitle: "Freeform notes you control",
+			    footer: '',
+			    getStarted: 'New Conversation',
+			    inputPlaceholder: 'Type your question..',
+	    	},
+	},
         });
         console.log('Chat widget mounted successfully');
     } catch (error) {
