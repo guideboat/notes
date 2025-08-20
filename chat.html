@@ -3,23 +3,28 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Notes – Chat</title>
+<title>Notes — Chat</title>
 <link rel="stylesheet" href="style.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@n8n/chat@latest/dist/style.css" />
 </head>
-<body>
-<header class="bar">
-<h1>Notes Chat</h1>
-<div class="spacer"></div>
-<button id="logout">Log out</button>
-</header>
+<body class="chat-layout">
+    <header class="chat-header">
+        <h1 class="chat-title">Notes Chat</h1>
+        <div class="user-info">
+            <span id="user-email">Loading...</span>
+            <button id="logout" class="logout-button">Log out</button>
+        </div>
+    </header>
 
+    <main class="chat-container">
+        <div id="chat-container">
+            <div style="display: flex; justify-content: center; align-items: center; height: 100%; flex-direction: column;">
+                <div class="loader"></div>
+                <p style="margin-top: 1rem; color: #6b7280;">Initializing chat...</p>
+            </div>
+        </div>
+    </main>
 
-<main class="page">
-<div id="chat-container"></div>
-</main>
-
-
-<script type="module" src="chat.js"></script>
+    <script type="module" src="chat.js"></script>
 </body>
 </html>
