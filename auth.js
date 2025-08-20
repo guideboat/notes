@@ -1,6 +1,6 @@
 // --- Replace these three values ---
 const SUPABASE_URL = 'https://opfsnfqakcyaubxfemhp.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wZnNuZnFha2N5YXVieGZlbWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzA1NjcsImV4cCI6MjA1MDU0NjU2N30.VMr9KV3dI4A8_fKkOdLkMJJHCCjgZTlnZIv6lhIHcCk';
+const SUPABASE_ANON_KEY = 'sb_publishable_nL82jlMzjLIZb11001HFtQ_VMr9KV3d';
 const CHAT_PAGE = 'chat.html';
 // ----------------------------------
 
