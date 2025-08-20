@@ -157,6 +157,7 @@ function mountChat(session, createChatFn) {
             target: '#chat-container',
             showWelcomeScreen: true,
             defaultLanguage: 'en',
+            initialMessages: ['Hello'],
         });
         console.log('Chat widget mounted successfully');
     } catch (error) {
