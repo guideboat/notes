@@ -1,34 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat · Supabase → n8n</title>
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-    <div class="chat-layout">
-        <header class="chat-header">
-            <h1 class="chat-title">Support Chat</h1>
-            <div class="user-info">
-                <span id="user-email">Loading...</span>
-                <button id="logout-button" class="logout-button">Logout</button>
-            </div>
-        </header>
-        
-        <main id="chat-container" class="chat-container">
-            <!-- The n8n chat iframe will be inserted here by JavaScript -->
-            <div class="loader"></div>
-        </main>
-    </div>
+  <div class="chat-layout">
+    <header class="chat-header">
+      <h1 class="chat-title">Chat</h1>
+      <div class="user-info">
+        <span id="user-email">(loading…)</span>
+        <button id="logout-button" class="logout-button">Log out</button>
+      </div>
+    </header>
 
-    <!-- Supabase Client Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- Your Chat Page Logic -->
-    <script src="chat.js"></script>
+    <div id="chat-container" class="chat-container">
+      <div class="loader" aria-label="Loading"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="./chat.js"></script>
 </body>
 </html>
