@@ -1,27 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chat · Supabase → n8n</title>
-  <link rel="stylesheet" href="./style.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Notes – Chat</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" />
 </head>
 <body>
-  <div class="chat-layout">
-    <header class="chat-header">
-      <h1 class="chat-title">Chat</h1>
-      <div class="user-info">
-        <span id="user-email">(loading…)</span>
-        <button id="logout-button" class="logout-button">Log out</button>
-      </div>
-    </header>
+<header class="bar">
+<h1>Notes Chat</h1>
+<div class="spacer"></div>
+<button id="logout">Log out</button>
+</header>
 
-    <div id="chat-container" class="chat-container">
-      <div class="loader" aria-label="Loading"></div>
-    </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="./chat.js"></script>
+<main class="page">
+<div id="chat-container"></div>
+</main>
+
+
+<script type="module" src="chat.js"></script>
 </body>
 </html>
