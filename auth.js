@@ -1,64 +1,55 @@
-// auth.js — handles Supabase login and redirects to chat.html
-const SUPABASE_URL  = 'https://opfsnfqakcyaubxfemhp.supabase.co';
-const SUPABASE_ANON = 'sb_publishable_nL82jlMzjLIZb11001HFtQ_VMr9KV3d';
+// --- Replace these three values ---
+const SUPABASE_URL = 'https://opfsnfqakcyaubxfemhp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_nL82jlMzjLIZb11001HFtQ_VMr9KV3d';
+const CHAT_PAGE = 'chat.html';
+// ----------------------------------
 
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-async function ensureSession() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    window.location.href = 'chat.html';
-  }
+import { createClient } from 'https://esm.sh/@supabase/supabase-js';
+
+
+// Persist session in localStorage so chat.js can read it
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+auth: { persistSession: true, storage: localStorage },
+});
+
+
+const form = document.querySelector('#login-form');
+const errorEl = document.querySelector('#error');
+
+
+form.addEventListener('submit', async (e) => {
+e.preventDefault();
+errorEl.hidden = true;
+
+
+const email = /** @type {HTMLInputElement} */(document.querySelector('#email')).value.trim();
+const password = /** @type {HTMLInputElement} */(document.querySelector('#password')).value;
+
+
+const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+if (error) {
+errorEl.textContent = error.message;
+errorEl.hidden = false;
+return;
 }
 
-async function main() {
-  await ensureSession();
 
-  document.getElementById('login-github')?.addEventListener('click', async () => {
-    const redirectTo = new URL('chat.html', window.location.href).toString();
-    const { error } = await sb.auth.signInWithOAuth({
-      provider: 'github',
-      options: { redirectTo }
-    });
-    if (error) {
-      const el = document.getElementById('error-message');
-      if (el) {
-        el.textContent = 'GitHub auth error: ' + error.message;
-        el.style.display = 'block';
-      } else {
-        alert('GitHub auth error: ' + error.message);
-      }
-    }
-  });
+// Optional: store a compact payload for n8n as well
+const s = data.session;
+localStorage.setItem('sb_compact', JSON.stringify({
+access_token: s.access_token,
+refresh_token: s.refresh_token,
+user: { id: s.user.id, email: s.user.email }
+}));
 
-  document.getElementById('login-email-form')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email')?.value?.trim();
-    const password = document.getElementById('password')?.value;
-    if (!email || !password) {
-      const el = document.getElementById('error-message');
-      if (el) {
-        el.textContent = 'Enter email + password';
-        el.style.display = 'block';
-      } else {
-        alert('Enter email + password');
-      }
-      return;
-    }
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) {
-      const el = document.getElementById('error-message');
-      if (el) {
-        el.textContent = 'Email login error: ' + error.message;
-        el.style.display = 'block';
-      } else {
-        alert('Email login error: ' + error.message);
-      }
-      return;
-    }
-    window.location.href = 'chat.html';
-  });
-}
 
-document.addEventListener('DOMContentLoaded', main);
+// Go to the chat page
+window.location.href = CHAT_PAGE;
+});
+
+
+// If already signed in, skip straight to chat
+supabase.auth.getSession().then(({ data }) => {
+if (data?.session) window.location.href = CHAT_PAGE;
+});
