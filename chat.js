@@ -53,15 +53,17 @@ async function setupChatPage() {
     // 1. Display user information on the page
     userEmailSpan.textContent = user.email;
 
-    // 2. Create and embed the n8n chat iframe
-    loadN8nChat(user);
+    // 2. Create and embed the n8n chat iframe, passing the full session
+    //    which contains the all-important access_token (JWT).
+    loadN8nChat(user, session);
 }
 
 /**
  * Creates the iframe and loads the n8n chat, passing user data as parameters.
  * @param {object} user - The authenticated Supabase user object.
+ * @param {object} session - The full Supabase session object.
  */
-function loadN8nChat(user) {
+function loadN8nChat(user, session) {
     // Clear the loading indicator
     chatContainer.innerHTML = '';
 
@@ -69,7 +71,11 @@ function loadN8nChat(user) {
     const chatUrlWithParams = new URL(N8N_CHAT_URL);
     chatUrlWithParams.searchParams.append('email', user.email);
     chatUrlWithParams.searchParams.append('userId', user.id);
-    // You can add more parameters here, like user.user_metadata.full_name if you have it
+    
+    // *** NEW CHANGE HERE ***
+    // Securely pass the user's JWT (access token) to the n8n workflow.
+    // This allows n8n to make authenticated requests to Supabase on the user's behalf.
+    chatUrlWithParams.searchParams.append('jwt', session.access_token);
 
     // Create the iframe element
     const iframe = document.createElement('iframe');
