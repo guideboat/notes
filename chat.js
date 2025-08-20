@@ -1,6 +1,6 @@
 // --- Replace these values ---
 const SUPABASE_URL = 'https://opfsnfqakcyaubxfemhp.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wZnNuZnFha2N5YXVieGZlbWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5NzA1NjcsImV4cCI6MjA1MDU0NjU2N30.VMr9KV3dI4A8_fKkOdLkMJJHCCjgZTlnZIv6lhIHcCk';
+const SUPABASE_ANON_KEY = 'sb_publishable_nL82jlMzjLIZb11001HFtQ_VMr9KV3d';
 const N8N_CHAT_WEBHOOK = 'https://hogueinstitute.app.n8n.cloud/webhook/c361deb0-4745-4ac0-8542-afdcbeb75799/chat'; // From Chat Trigger panel
 const LOGIN_PAGE = 'index.html';
 // --------------------------------
