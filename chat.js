@@ -1,7 +1,7 @@
 // --- Replace these values ---
-const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_PUBLIC_KEY';
-const N8N_CHAT_WEBHOOK = 'https://YOUR_N8N_HOST/chat/YOUR_CHAT_TRIGGER_ID'; // From Chat Trigger panel
+const SUPABASE_URL = 'https://opfsnfqakcyaubxfemhp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_nL82jlMzjLIZb11001HFtQ_VMr9KV3d';
+const N8N_CHAT_WEBHOOK = 'https://hogueinstitute.app.n8n.cloud/webhook/c361deb0-4745-4ac0-8542-afdcbeb75799/chat'; // From Chat Trigger panel
 // --------------------------------
 
 
