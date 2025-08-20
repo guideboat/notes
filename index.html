@@ -1,38 +1,23 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login · Supabase → n8n Chat</title>
-  <link rel="stylesheet" href="./style.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Notes – Sign in</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="auth-container">
-    <div class="auth-card">
-      <h1 class="card-title">Sign in</h1>
-      <p class="card-subtitle">Use Supabase auth, then continue to the embedded n8n chat.</p>
+<main class="card">
+<h1>Sign in to Notes</h1>
+<form id="login-form">
+<label>Email <input id="email" type="email" required placeholder="you@example.com" /></label>
+<label>Password <input id="password" type="password" required /></label>
+<button type="submit">Sign in</button>
+</form>
+<p id="error" class="error" hidden></p>
+</main>
 
-      <button id="login-github" class="auth-button">Continue with GitHub</button>
 
-      <form id="login-email-form" style="margin-top: 1rem;">
-        <div class="input-group">
-          <label for="email">Email</label>
-          <input id="email" type="email" placeholder="Email" />
-        </div>
-        <div class="input-group">
-          <label for="password">Password</label>
-          <input id="password" type="password" placeholder="Password" />
-        </div>
-        <button type="submit" class="auth-button">Sign in with Email</button>
-      </form>
-
-      <div id="error-message" class="error-message"></div>
-
-      <p class="footer-text">After login you will be redirected to <code>chat.html</code>.</p>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="./auth.js"></script>
+<script type="module" src="auth.js"></script>
 </body>
 </html>
