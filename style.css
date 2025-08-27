@@ -184,6 +184,25 @@ body {
     animation: spin 1s linear infinite;
 }
 
+/* Make the n8n chat input more comfortable */
+.n8n-chat-input-container {
+  margin-bottom: 1rem !important;   /* lifts it off the very bottom */
+  padding: 0.75rem 1rem !important; /* adds breathing space */
+  min-height: 3.5rem !important;    /* taller overall */
+  border-radius: 0.5rem;            /* optional: rounded corners */
+  font-size: 1rem !important;       /* larger text */
+  background-color: #fff;           /* clean background */
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.05);
+}
+
+/* Ensure the input itself grows */
+.n8n-chat-input-container textarea {
+  min-height: 3rem !important;
+  line-height: 1.4;
+  font-size: 1rem;
+  resize: vertical; /* allow user to expand if needed */
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
