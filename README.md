@@ -1,4 +1,4 @@
-# Notes Chat Application
+# Noted! Chat Application
 
 ## Description
 The Notes Chat Application is a web-based platform that provides a secure chat interface for users. It leverages Supabase for authentication and session management. Users can sign in to access their chat interface, which is designed to be user-friendly and responsive.
