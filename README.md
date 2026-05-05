@@ -1,12 +1,12 @@
 # Notes Chat Application
 
 ## Description
-The Notes Chat Application is a web-based platform that provides a secure chat interface for users. It leverages Supabase for authentication and session management, and integrates with the n8n service to offer a dynamic chat experience. Users can sign in to access their chat interface, which is designed to be user-friendly and responsive.
+The Notes Chat Application is a web-based platform that provides a secure chat interface for users. It leverages Supabase for authentication and session management. Users can sign in to access their chat interface, which is designed to be user-friendly and responsive.
 
 ## Features
 - **User Authentication**: Secure login using email and password, powered by Supabase.
 - **Session Management**: Persistent sessions with automatic token refresh and local storage caching.
-- **Chat Interface**: Interactive chat widget integrated with n8n, supporting real-time messaging.
+- **Chat Interface**: Interactive chat widget supporting real-time messaging.
 - **Error Handling**: Comprehensive error messages and retry options for seamless user experience.
 - **Responsive Design**: Mobile-friendly layout with a clean and modern interface.
 
@@ -21,41 +21,7 @@ The Notes Chat Application is a web-based platform that provides a secure chat i
 - **Chat**: Once signed in, you will be redirected to the chat interface where you can interact with the chat widget.
 - **Logout**: Use the logout button to securely end your session.
 
-## GitHub Authentication Update
-
-GitHub no longer supports password authentication for Git operations. Instead, you need to use a personal access token (PAT) for authentication. Here's how you can resolve this issue:
-
-### Steps to Use a Personal Access Token for GitHub
-
-1. **Generate a Personal Access Token**:
-   - Go to your GitHub account settings.
-   - Navigate to **Developer settings** > **Personal access tokens**.
-   - Click on **Generate new token**.
-   - Give your token a descriptive name and select the scopes or permissions you need (for pushing code, you'll need `repo` scope).
-   - Click **Generate token** and copy the token. You won't be able to see it again once you leave the page.
-
-2. **Update Your Git Credentials**:
-   - When prompted for a username and password during a Git operation, use your GitHub username as the username.
-   - Use the personal access token you generated as the password.
-
-3. **Cache Your Credentials** (Optional):
-   - You can cache your credentials to avoid entering them every time. Run the following command in your terminal:
-     ```bash
-     git config --global credential.helper cache
-     ```
-   - This will cache your credentials in memory for use by future Git programs.
-
-4. **Push Your Changes**:
-   - Now, try pushing your changes again:
-     ```bash
-     git push origin main
-     ```
-   - Replace `main` with your branch name if it's different.
-
-By following these steps, you should be able to authenticate successfully and push your changes to GitHub. If you encounter any issues, please let me know!
 
 ## Contributing
-Guidelines for contributing to the project.
 
 ## License
-Information about the project's license.
